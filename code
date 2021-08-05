@@ -1,0 +1,191 @@
+int leftInput=A1;/*defining pins of ir sensor*/
+int midInput=A2;/*defining pins of ir sensor*/
+int rightInput=A3;/*defining pins of ir sensor*/
+int left_motorpin1 = 5;/*defining pins of motor*/
+int left_motorpin2 = 6;/*defining pins of motor*/
+int right_motorpin3 =11;
+int right_motorpin4 = 12;/*defining pins of motor*/
+int leftValue = 0;/*initialising value of ir sensor*/
+int rightValue = 0;/*initialising value of ir sensor*/
+int midValue = 0;/*initialising value of ir sensor*/
+
+void forward();
+void take_right();
+void take_left();
+void halt();
+void reverse();
+void take_half_right();
+void take_half_left();
+/*******************************************{[ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ultrasonic part~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~]}**************************************************************/
+
+#include <NewPing.h>// ultra sonic part
+
+#define TRIGGER_PIN_left  12  // Arduino pin tied to trigger pin on ping sensor.
+#define TRIGGER_PIN_right  13  // Arduino pin tied to trigger pin on ping sensor.
+#define ECHO_PIN_left   11  // Arduino pin tied to echo pin on ping sensor.
+#define ECHO_PIN_right  10  // Arduino pin tied to echo pin on ping sensor.
+#define MAX_DISTANCE 3000 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+
+NewPing sonar_left(TRIGGER_PIN_left, ECHO_PIN_left, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+NewPing sonar_right(TRIGGER_PIN_right, ECHO_PIN_right, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+
+unsigned int pingSpeed = 50; // How frequently are we going to send out a ping (in milliseconds). 50ms would be 20 times a second.
+unsigned long pingTimer;     // Holds the next ping time.
+
+
+/******************************************{[ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ setting pins~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~]}**************************************************************/
+
+void setup()
+{
+  Serial.begin(9600);
+pinMode(left_motorpin1, OUTPUT);
+pinMode(left_motorpin2, OUTPUT);
+pinMode(right_motorpin3, OUTPUT);
+pinMode(right_motorpin4, OUTPUT);
+}
+
+/*******************************************{[ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~loop~~~~~~~~~~~~~~~~~~~]}**************************************************************/
+
+void loop()
+{
+
+  delay(1000);  
+  leftValue = analogRead (leftInput);     /*reading value*/
+  rightValue= analogRead (rightInput);   /*reading value*/
+  midValue= analogRead (midInput);      /*reading value*/
+  Serial.println(" ");                                  //communicating with virtual terminal
+  Serial.println("left input is ");                    //communicating with virtual terminal
+  Serial.print(leftValue);                            //communicating with virtual terminal
+  Serial.println(" ");                               //communicating with virtual terminal
+  Serial.println("right input is ");                //communicating with virtual terminal
+  Serial.print(rightValue);                        //communicating with virtual terminal
+  Serial.println(" ");                            //communicating with virtual terminal
+  Serial.println("mid input is ");               //communicating with virtual terminal
+  Serial.print(midValue);                       //communicating with virtual terminal
+  Serial.println(" ");                         //communicating with virtual terminal
+  
+  
+ if( midValue<=610)
+    {
+      forward();
+    }
+ /*    else if (leftValue <=80 && rightValue<=80 )//REVERSE
+       {   
+        delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+        unsigned int uS_left = sonar_left.ping(); // Send ping, get ping time in microseconds (uS).
+        Serial.print("Ping left: ");
+        int value_left = uS_left / US_ROUNDTRIP_CM;
+        Serial.print(value_left); // Convert ping time to distance in cm and print result (0 = outside set distance range)
+        Serial.println("cm");
+        unsigned int uS_right = sonar_right.ping(); // Send ping, get ping time in microseconds (uS).
+        Serial.print("Ping right: ");
+        int value_right =uS_right / US_ROUNDTRIP_CM;
+        Serial.print(value_right); // Convert ping time to distance in cm and print result (0 = outside set distance range)
+        Serial.println("cm");
+       if(value_left<20&&value_left>10)
+         {
+         take_left();
+         }
+       else if(value_right<20&&value_right>10)
+         {
+         take_right();
+         }
+       else if(value_left<20&&value_left>10 && value_right<20&&value_right>10)0
+        {
+        take_right();
+        }
+       else
+        {
+          forward();
+        }
+    }*/
+
+  
+    if( midValue>=500)
+     {
+       if(leftValue>=500 && rightValue<=3500)/*take right*/
+      {
+                halt();
+         delay(10);
+      take_right();
+      }
+      else if (leftValue <=350 && rightValue >=500)/*take left*/
+      {
+        halt();
+       delay(10);
+       take_left();
+      }
+    else
+        {
+          halt();
+        }
+     }
+      
+}
+
+void forward()
+{
+  digitalWrite (left_motorpin1, HIGH);
+       digitalWrite (left_motorpin2, LOW);
+       digitalWrite (right_motorpin3, HIGH);
+       digitalWrite (right_motorpin4, LOW);
+      delay(10);
+       Serial.println("moving forward");
+      
+}
+void take_right()
+{
+     digitalWrite (left_motorpin1, LOW);
+     digitalWrite (left_motorpin2, HIGH);
+     digitalWrite (right_motorpin3, HIGH);
+     digitalWrite (right_motorpin4, LOW);
+     delay(10);
+     Serial.println("moving right");
+}
+void take_left()
+{
+    digitalWrite (left_motorpin1, HIGH);
+    digitalWrite (left_motorpin2, LOW);
+    digitalWrite (right_motorpin3, LOW);
+    digitalWrite (right_motorpin4, HIGH);
+    delay(10);
+    Serial.println("moving left");
+}
+void halt()
+{
+    digitalWrite (left_motorpin1, LOW);
+    digitalWrite (left_motorpin2, LOW);
+    digitalWrite (right_motorpin3, LOW);
+    digitalWrite (right_motorpin4, LOW);
+    delay(10);
+    Serial.println("halt");
+}
+void reverse()
+{
+    digitalWrite (left_motorpin1, LOW);
+    digitalWrite (left_motorpin2, HIGH);
+    digitalWrite (right_motorpin3, LOW);
+    digitalWrite (right_motorpin4, HIGH);
+    delay(10);
+    Serial.println("moving reverse");
+}
+void take_half_right()
+{
+     digitalWrite (left_motorpin1, LOW);
+     digitalWrite (left_motorpin2, LOW);
+     digitalWrite (right_motorpin3, HIGH);
+     digitalWrite (right_motorpin4, LOW);
+     delay(10);
+     Serial.println("moving right");
+}
+void take_half_left()
+{
+    digitalWrite (left_motorpin1, HIGH);
+    digitalWrite (left_motorpin2, LOW);
+    digitalWrite (right_motorpin3, LOW);
+    digitalWrite (right_motorpin4, LOW);
+    delay(10);
+    Serial.println("moving left");
+}
+
+/***************************************************************{[END OF PROGRAM]}*****************************************************************************************/
